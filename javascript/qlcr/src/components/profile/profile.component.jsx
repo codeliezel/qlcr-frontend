@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import axios from '../../services/axios';
 
-export default function Registration() {
+export default function Profile(props) {
   const history = useHistory();
 
   const [loading, setLoading] = useState(false);
@@ -23,18 +23,19 @@ export default function Registration() {
     try {
       event.preventDefault();
       setLoading(true);
-      const userData = await axios.post('/user/signup',
+      // eslint-disable-next-line react/prop-types
+      const updateUserData = await axios.patch(`/user/settings/${props.match.params.id}`,
         {
           firstName, lastName, email, password, phoneNumber, userName,
         });
-      const { status } = userData.data;
-      if (status === 201) {
+      const { status } = updateUserData.data;
+      if (status === 200) {
         history.push('/dashboard');
       }
-      const { token } = userData.data.data;
-      window.localStorage.setItem('QLCRtoken', token);
-    // eslint-disable-next-line no-empty
+    //   const { token } = updateUserData.data.data;
+    //   window.localStorage.setItem('QLCRtoken', token);
     } catch (error) {
+      setLoading(false);
     }
   };
 
@@ -91,6 +92,9 @@ export default function Registration() {
         />
         <br />
         <input type="submit" value="Sign up" />
+        <Link to={{ pathname: '/login' }}>
+          <h5 align="center"> Log in.</h5>
+        </Link>
       </form>
     </>
   );
